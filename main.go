@@ -6,8 +6,8 @@ import (
 )
 
 // Constants for the image size.
-const XSIZE = 2560
-const YSIZE = 2048
+const XSIZE = 50 //2560
+const YSIZE = 40 // 2048
 
 // Constant for the number of iterations to perform.
 const MAX_ITER = 255
@@ -18,8 +18,7 @@ const xRight = 1.0
 const yCenter = 0.0
 
 func main() {
-	z := 0.1 + 0.1i
-	fmt.Println(ComputeIterations(z))
+	PrintFractal()
 }
 
 // ComputeIterations returns how many iterations took the complex n to diverge.
@@ -42,4 +41,22 @@ func ComputeYBounds(step float64) (yUpper, yLower float64) {
 	yUpper = yCenter + (step*YSIZE)/2
 	yLower = yCenter - (step*YSIZE)/2
 	return yUpper, yLower
+}
+
+// PrintFractal displays the fractal on the screen
+func PrintFractal() {
+	step := ComputeStep()
+	yUpper, _ := ComputeYBounds(step)
+	for i := 0; i < YSIZE; i++ {
+		for j := 0; j < XSIZE; j++ {
+			n := complex(xLeft+float64(j)*step, yUpper-float64(i)*step)
+			iterations := ComputeIterations(n)
+			if iterations > MAX_ITER/10 {
+				fmt.Print("X")
+			} else {
+				fmt.Print(" ")
+			}
+		}
+		fmt.Println("")
+	}
 }
