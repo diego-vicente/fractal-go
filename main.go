@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	//	"bufio"
 	"fmt"
 	"image"
 	"image/color"
@@ -11,8 +11,8 @@ import (
 )
 
 // Constants for the image size.
-const XSIZE = 50 //2560
-const YSIZE = 40 // 2048
+const XSIZE = 2560
+const YSIZE = 2048
 
 // Constant for the number of iterations to perform.
 const MAX_ITER = 255
@@ -75,10 +75,12 @@ func PrintFractal() {
 	}
 }
 
+// GenerateMandelbrot creates a Gray image with the iteration number, fills it
+// with the appropriate values and returns a pointer to the image.
 func GenerateMandelbrot() (fractal *image.Gray) {
 	step := ComputeStep()
 	ComputeYBounds(step)
-	fractal = image.NewGray(image.Rect(0, YSIZE, 0, XSIZE))
+	fractal = image.NewGray(image.Rect(0, 0, XSIZE, YSIZE))
 
 	for i := 0; i < YSIZE; i++ {
 		for j := 0; j < XSIZE; j++ {
@@ -91,11 +93,11 @@ func GenerateMandelbrot() (fractal *image.Gray) {
 	return fractal
 }
 
+// SaveImage saves the created fractal representations
 func SaveImage(fractal *image.Gray) {
-	f, err := os.Create("./mandelbrot.png")
-	print(err)
-	writer := bufio.NewWriter(f)
-	img := fractal.SubImage(image.Rect(0, YSIZE, 0, XSIZE))
-	err = png.Encode(writer, img)
-	print(err)
+	f, _ := os.Create("mandelbrot.png")
+	defer f.Close()
+	if err := png.Encode(f, fractal); err != nil {
+		panic(err)
+	}
 }
