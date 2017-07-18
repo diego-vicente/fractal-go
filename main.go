@@ -17,6 +17,9 @@ const xLeft = -2.0
 const xRight = 1.0
 const yCenter = 0.0
 
+// The y axis parameter have to be computed depending on the size of the image.
+var yUpper, yLower float64
+
 func main() {
 	PrintFractal()
 }
@@ -36,20 +39,25 @@ func ComputeStep() float64 {
 	return (xRight - xLeft) / XSIZE
 }
 
-// ComputeYBounds returns the y-axis boundaries for a given step.
-func ComputeYBounds(step float64) (yUpper, yLower float64) {
+// ComputeYBounds sets the global y-axis boundaries for a given step.
+func ComputeYBounds(step float64) {
 	yUpper = yCenter + (step*YSIZE)/2
 	yLower = yCenter - (step*YSIZE)/2
-	return yUpper, yLower
 }
 
-// PrintFractal displays the fractal on the screen
+// ComplexAt returns the associate complex to a i-j iteration and a step.
+func ComplexAt(i, j int, step float64) (n complex128) {
+	return complex(xLeft+float64(j)*step, yUpper-float64(i)*step)
+}
+
+// PrintFractal displays the fractal on the screen, using text
 func PrintFractal() {
 	step := ComputeStep()
-	yUpper, _ := ComputeYBounds(step)
-	for i := 0; i < YSIZE; i++ {
-		for j := 0; j < XSIZE; j++ {
-			n := complex(xLeft+float64(j)*step, yUpper-float64(i)*step)
+	ComputeYBounds(step)
+
+	for i := 0; i < 40; i++ {
+		for j := 0; j < 50; j++ {
+			n := ComplexAt(i, j, step)
 			iterations := ComputeIterations(n)
 			if iterations > MAX_ITER/10 {
 				fmt.Print("X")
