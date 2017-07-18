@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"image"
+	"image/color"
+	"image/png"
 	"math/cmplx"
+	"os"
 )
 
 // Constants for the image size.
@@ -21,7 +26,8 @@ const yCenter = 0.0
 var yUpper, yLower float64
 
 func main() {
-	PrintFractal()
+	fractal := GenerateMandelbrot()
+	SaveImage(fractal)
 }
 
 // ComputeIterations returns how many iterations took the complex n to diverge.
@@ -67,4 +73,29 @@ func PrintFractal() {
 		}
 		fmt.Println("")
 	}
+}
+
+func GenerateMandelbrot() (fractal *image.Gray) {
+	step := ComputeStep()
+	ComputeYBounds(step)
+	fractal = image.NewGray(image.Rect(0, YSIZE, 0, XSIZE))
+
+	for i := 0; i < YSIZE; i++ {
+		for j := 0; j < XSIZE; j++ {
+			n := ComplexAt(i, j, step)
+			iterations := ComputeIterations(n)
+			fractal.Set(j, i, color.Gray{iterations})
+		}
+	}
+
+	return fractal
+}
+
+func SaveImage(fractal *image.Gray) {
+	f, err := os.Create("./mandelbrot.png")
+	print(err)
+	writer := bufio.NewWriter(f)
+	img := fractal.SubImage(image.Rect(0, YSIZE, 0, XSIZE))
+	err = png.Encode(writer, img)
+	print(err)
 }
