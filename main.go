@@ -77,16 +77,16 @@ func PrintFractal() {
 
 // GenerateMandelbrot creates a Gray image with the iteration number, fills it
 // with the appropriate values and returns a pointer to the image.
-func GenerateMandelbrot() (fractal *image.Gray) {
+func GenerateMandelbrot() (fractal *image.RGBA) {
 	step := ComputeStep()
 	ComputeYBounds(step)
-	fractal = image.NewGray(image.Rect(0, 0, XSIZE, YSIZE))
+	fractal = image.NewRGBA(image.Rect(0, 0, XSIZE, YSIZE))
 
 	for i := 0; i < YSIZE; i++ {
 		for j := 0; j < XSIZE; j++ {
 			n := ComplexAt(i, j, step)
 			iterations := ComputeIterations(n)
-			fractal.Set(j, i, color.Gray{iterations})
+			fractal.Set(j, i, FancyColour(iterations))
 		}
 	}
 
@@ -94,10 +94,26 @@ func GenerateMandelbrot() (fractal *image.Gray) {
 }
 
 // SaveImage saves the created fractal representations
-func SaveImage(fractal *image.Gray) {
+func SaveImage(fractal *image.RGBA) {
 	f, _ := os.Create("mandelbrot.png")
 	defer f.Close()
 	if err := png.Encode(f, fractal); err != nil {
 		panic(err)
+	}
+}
+
+func FancyColour(iter uint8) color.RGBA {
+	switch {
+	case iter == MAX_ITER:
+		return color.RGBA{0, 0, 0, 255}
+	case iter < 8:
+		return color.RGBA{128 + (iter * 16), 0, 0, 255}
+	case iter < 24:
+		return color.RGBA{255, (iter - 8) * 16, (iter - 8) * 16, 255}
+	case iter < 160:
+		return color.RGBA{255 - (iter-24)*2, 255 - (iter-24)*2, 255, 255}
+	default:
+		return color.RGBA{(iter - 160) * 2, (iter - 160) * 2,
+			255 - (iter-160)*2, 255}
 	}
 }
