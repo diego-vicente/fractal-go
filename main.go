@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"math/cmplx"
 	"os"
+	"time"
 )
 
 // Constants for the image size.
@@ -25,9 +26,21 @@ const yCenter = 0.0
 // The y axis parameter have to be computed depending on the size of the image.
 var yUpper, yLower float64
 
+// Define the type of a FractalGenerator
+type FractalGenerator func() *image.RGBA
+
 func main() {
-	fractal := GenerateMandelbrot()
+	fractal := TimeIt(GenerateMandelbrot)
 	SaveImage(fractal)
+}
+
+func TimeIt(function FractalGenerator) (image *image.RGBA) {
+	start := time.Now()
+	image = function()
+	end := time.Now()
+
+	fmt.Printf("Generation took: %s\n", end.Sub(start))
+	return image
 }
 
 // ComputeIterations returns how many iterations took the complex n to diverge.
