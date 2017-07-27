@@ -27,23 +27,14 @@ const yCenter = 0.0
 // The y axis parameter have to be computed depending on the size of the image.
 var yUpper, yLower float64
 
-// Define the type of a FractalGenerator
-type FractalGenerator func(int) *image.RGBA
-
 func main() {
 	runtime.GOMAXPROCS(4)
 	routines := 4 // TODO: input as flag
-	fractal := TimeIt(GenerateMandelbrot, routines)
-	SaveImage(fractal)
-}
-
-func TimeIt(function FractalGenerator, routines int) (image *image.RGBA) {
 	start := time.Now()
-	image = function(routines)
+	fractal := MandelbrotBands(routines)
 	end := time.Now()
-
 	fmt.Printf("Generation took: %s\n", end.Sub(start))
-	return image
+	SaveImage(fractal)
 }
 
 // ComputeIterations returns how many iterations took the complex n to diverge.
@@ -70,58 +61,6 @@ func ComputeYBounds(step float64) {
 // ComplexAt returns the associate complex to a i-j iteration and a step.
 func ComplexAt(i, j int, step float64) (n complex128) {
 	return complex(xLeft+float64(j)*step, yUpper-float64(i)*step)
-}
-
-// PrintFractal displays the fractal on the screen, using text
-func PrintFractal() {
-	step := ComputeStep()
-	ComputeYBounds(step)
-
-	for i := 0; i < 40; i++ {
-		for j := 0; j < 50; j++ {
-			n := ComplexAt(i, j, step)
-			iterations := ComputeIterations(n)
-			if iterations > MAX_ITER/10 {
-				fmt.Print("X")
-			} else {
-				fmt.Print(" ")
-			}
-		}
-		fmt.Println("")
-	}
-}
-
-// GenerateMandelbrot creates a Gray image with the iteration number, fills it
-// with the appropriate values and returns a pointer to the image.
-func GenerateMandelbrot(routines int) (fractal *image.RGBA) {
-	step := ComputeStep()
-	ComputeYBounds(step)
-	fractal = image.NewRGBA(image.Rect(0, 0, XSIZE, YSIZE))
-	bandSize := YSIZE / routines
-	done := make(chan int)
-
-	for i := 0; i < routines; i++ {
-		go ComputeBand(i*bandSize, (i+1)*bandSize, step, fractal, done)
-	}
-
-	for i := 0; i < routines; i++ {
-		<-done
-	}
-
-	return fractal
-}
-
-func ComputeBand(initialY, finalY int, step float64, fractal *image.RGBA,
-	done chan int) {
-
-	for i := initialY; i <= finalY; i++ {
-		for j := 0; j < XSIZE; j++ {
-			n := ComplexAt(i, j, step)
-			iterations := ComputeIterations(n)
-			fractal.Set(j, i, FancyColor(iterations))
-		}
-	}
-	done <- 1
 }
 
 // SaveImage saves the created fractal representations
