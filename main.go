@@ -2,6 +2,7 @@ package main
 
 import (
 	//	"bufio"
+	"flag"
 	"fmt"
 	"image"
 	"image/color"
@@ -27,12 +28,17 @@ const yCenter = 0.0
 // The y axis parameter have to be computed depending on the size of the image.
 var yUpper, yLower float64
 
+// Flag to obtain the number of goroutines to use in the generation
+var NRoutines = flag.Int("n", 1, "number of goroutines to launch")
+
 func main() {
-	runtime.GOMAXPROCS(4)
-	routines := 4 // TODO: input as flag
+	flag.Parse()
+	runtime.GOMAXPROCS(*NRoutines)
+
 	start := time.Now()
-	fractal := MandelbrotBands(routines)
+	fractal := MandelbrotBands(*NRoutines)
 	end := time.Now()
+
 	fmt.Printf("Generation took: %s\n", end.Sub(start))
 	SaveImage(fractal)
 }
