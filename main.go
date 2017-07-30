@@ -47,7 +47,7 @@ func main() {
 func ComputeIterations(n complex128) (iterations uint8) {
 	z := n
 	for cmplx.Abs(z) < 4 && iterations < MAX_ITER {
-		z = cmplx.Pow(z, 2) + n
+		z = z*z + n
 		iterations += 1
 	}
 	return iterations
