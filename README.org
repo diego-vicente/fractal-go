@@ -1,0 +1,23 @@
+#+TITLE:  Generating the Mandelbrot set in Go
+#+AUTHOR: Diego Vicente Martín
+#+EMAIL:  diegovicente@protonmail.com
+
+[[./mandelbrot.png]]
+
+As an exercise for learning Go, I decided to start writing a simple program to
+generate the Mandelbrot set. While it still needs quite a lot of refactoring,
+the program still keeps all the methods I have used to generate the set:
+
+- First, simply sequentially computing the pixels and storing everything in a
+  RGBA image.
+- Then, receiving a number of routines to launch, split the image in several
+  vertical sections and make each of the goroutines compute a band of the
+  image. Once the corresponding section is drawn, signal the main routine using
+  a channel.
+- Eventually, the best results were obtained by creating a channel that works
+  as a job pool and serves each routine an individual line to work on by
+  demand. That way, the workload is distributed equally among all routines.
+
+To run it, use the flag =-n= to define the number of routines to be launched:
+for example: =fractal-go -n 8= will create 8 goroutines to query jobs from the
+channel.
