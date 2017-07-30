@@ -14,8 +14,8 @@ import (
 )
 
 // Constants for the image size.
-const XSIZE = 2560
-const YSIZE = 2048
+const XSIZE = 4 * 2560
+const YSIZE = 4 * 2048
 
 // Constant for the number of iterations to perform.
 const MAX_ITER = 255
