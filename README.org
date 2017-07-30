@@ -2,7 +2,7 @@
 #+AUTHOR: Diego Vicente Martín
 #+EMAIL:  diegovicente@protonmail.com
 
-[[./mandelbrot.png]]
+[[./example.png]]
 
 As an exercise for learning Go, I decided to start writing a simple program to
 generate the Mandelbrot set. While it still needs quite a lot of refactoring,
@@ -20,4 +20,5 @@ the program still keeps all the methods I have used to generate the set:
 
 To run it, use the flag =-n= to define the number of routines to be launched:
 for example: =fractal-go -n 8= will create 8 goroutines to query jobs from the
-channel.
+channel. This will generate an 8K image of the fractal, which in my laptop
+takes around 30 seconds to compute.
