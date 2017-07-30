@@ -62,6 +62,37 @@ func ComputeBand(initialY, finalY int, step float64, fractal *image.RGBA,
 	done <- 1
 }
 
+func MandelbrotLines(routines int) (fractal *image.RGBA) {
+	step := ComputeStep()
+	ComputeYBounds(step)
+	fractal = image.NewRGBA(image.Rect(0, 0, XSIZE, YSIZE))
+	lines := make(chan int)
+
+	for i := 0; i < routines; i++ {
+		go ComputeLines(lines, step, fractal)
+	}
+
+	for i := 0; i <= YSIZE; i++ {
+		lines <- i
+	}
+
+	close(lines)
+
+	return fractal
+}
+
+// ComputeLines draws all the pixels of the lines that are being served in a
+// given channel, that acts as a job pool.
+func ComputeLines(lines chan int, step float64, fractal *image.RGBA) {
+	for line := range lines {
+		for i := 0; i < XSIZE; i++ {
+			n := ComplexAt(line, i, step)
+			iterations := ComputeIterations(n)
+			fractal.Set(i, line, FancyColor(iterations))
+		}
+	}
+}
+
 // PrintFractal displays the fractal on the screen, using text
 func PrintFractal() {
 	step := ComputeStep()

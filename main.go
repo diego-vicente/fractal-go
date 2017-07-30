@@ -36,7 +36,7 @@ func main() {
 	runtime.GOMAXPROCS(*NRoutines)
 
 	start := time.Now()
-	fractal := MandelbrotBands(*NRoutines)
+	fractal := MandelbrotLines(*NRoutines)
 	end := time.Now()
 
 	fmt.Printf("Generation took: %s\n", end.Sub(start))
